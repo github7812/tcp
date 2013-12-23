@@ -11,8 +11,9 @@ import random
 
 class NetworkSimulator(object):
 
-  def __init__(self, receiver):
-    self.receiver = receiver
+  def __init__(self):
+    self.recv = None
+    self.send = None
     self.datas = []
 
   def Send(self, data):
@@ -21,15 +22,23 @@ class NetworkSimulator(object):
   def Flush(self):
     random.shuffle(self.datas)
     for data in self.datas:
-      self.receiver.NetworkReceived(data)
+      self.recv.NetworkReceived(data)
+
+  def SendToSender(self, packet):
+    self.send.PacketFromReceiver(packet)
+
+  def SendToReceiver(self, packet):
+    self.recv.PacketFromSender(packet)
 
 
-recv = receiver.Receiver()
-sim = NetworkSimulator(recv)
+sim = NetworkSimulator()
+recv = receiver.Receiver(sim)
 send = sender.Sender(sim)
+sim.recv = recv
+sim.send = send
 
-send.ApplicationSend(1)
+send.ApplicationSend('a string')
 send.ApplicationSend(2)
-send.ApplicationSend(3)
+send.ApplicationSend(True)
 
 sim.Flush()
